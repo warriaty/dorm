@@ -1,0 +1,18 @@
+# To build `docker build -t dorm .`
+FROM eclipse-temurin:17.0.4_8-jdk-focal as build
+WORKDIR /workspace/app
+COPY gradle gradle
+COPY build.gradle settings.gradle secrets.gradle gradlew ./
+COPY src src
+RUN ./gradlew build -x test
+
+# To build for intel/amd `--platform=linux/amd64`
+FROM eclipse-temurin:17.0.4_8-jre-focal
+COPY  --from=build /workspace/app/build/libs/dorm-be-*.jar /app/lib/dorm-be.jar
+
+RUN groupadd -r dorm_user && useradd -r -s /bin/false -g dorm_user dorm_user
+WORKDIR /app
+RUN chown -R dorm_user:dorm_user /app
+USER dorm_user
+
+ENTRYPOINT ["java", "-jar" ,"/app/lib/dorm-be.jar"]

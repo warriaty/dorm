@@ -1,0 +1,22 @@
+version: '2.4'
+services:
+  postgres:
+    container_name: dorm-db
+    image: postgres:13-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: dorm
+      POSTGRES_PASSWORD: dorm
+    ports:
+      - "5432:5432"
+  dorm-be:
+    container_name: dorm-be
+    image: dorm:latest
+    environment:
+      POSTGRES_HOST: dorm-db
+      POSTGRES_USER: dorm
+      POSTGRES_PASSWORD: dorm
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"

@@ -1,0 +1,87 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.0.4'
+    id 'io.spring.dependency-management' version '1.1.0'
+}
+
+group = 'com.warriaty'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.4'
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'org.postgresql:postgresql'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+}
+
+apply from: "${rootProject.projectDir}/secrets.gradle"
+
+ext {
+    propsPath = "src/main/resources/application.properties"
+}
+
+// Jasypt
+tasks.register('encryptProperties') {
+    def decipheredSecretPattern = "DEC\\(.+\\)"
+    def props = new Properties()
+    file(propsPath).withInputStream { props.load(it) }
+
+    props.entrySet().stream()
+            .filter {
+                property ->
+                    property.value.toString().matches(decipheredSecretPattern)
+            }
+            .forEach {
+                property ->
+                    def stdout = new ByteArrayOutputStream()
+                    exec {
+                        def secretVal = property.value.substring(4, property.value.toString().length() - 1)
+                        commandLine "java",
+                                "-cp",
+                                "${findJar("jasypt-[\\d|.]{5}.jar").asPath}",
+                                "org.jasypt.intf.cli.JasyptPBEStringEncryptionCLI",
+                                "ivGeneratorClassName=org.jasypt.iv.RandomIvGenerator",
+                                "algorithm=PBEwithHmacSHA512AndAES_256",
+                                "input=${secretVal}",
+                                "password=${Secrets.jasypt_key}",
+                                "verbose=false"
+                        standardOutput = stdout
+                    }
+                    def propsString = new File(propsPath.toString()).text
+                    file(propsPath).withOutputStream {
+                        it.write(
+                                propsString.replace(
+                                        "${property.key}=${property.value}",
+                                        "${property.key}=ENC(${stdout.toString().trim()})"
+                                ).getBytes()
+                        )
+                    }
+            }
+}
+
+def findJar(regex) {
+    configurations.runtimeClasspath.filter { it.name.matches(regex) }
+}
+
+tasks.named('test') {
+    jvmArgs = ["-Djasypt.encryptor.password=${Secrets.jasypt_key}"]
+    useJUnitPlatform()
+}
