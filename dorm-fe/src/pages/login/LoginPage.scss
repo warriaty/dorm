@@ -1,0 +1,8 @@
+.login-content {
+  --background: center / cover no-repeat url("../../../public/assets/login.jpg");
+}
+
+.login-card {
+  --background: rgba(var(--ion-color-light-rgb),0.95);
+  min-width: 400px;
+}

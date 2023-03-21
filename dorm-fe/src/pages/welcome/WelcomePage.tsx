@@ -10,10 +10,10 @@ const WelcomePage: React.FC = () => {
             <IonHeader>
                 <IonToolbar>
                     <IonButtons className="ion-padding" slot="end">
-                        <IonButton color="primary">
+                        <IonButton routerLink="/login" color="primary">
                             Login
                         </IonButton>
-                        <IonButton color="primary">
+                        <IonButton routerLink="/register" color="primary">
                             Register
                         </IonButton>
                     </IonButtons>
@@ -23,8 +23,8 @@ const WelcomePage: React.FC = () => {
             <IonContent scrollY={true} className="ion-padding">
                 <div className="container">
                     <div className="row mb-5 d-flex justify-content-center">
-                        <div className="background d-flex flex-column justify-content-center align-items-center">
-                            <div className="content">
+                        <div className="banner d-flex flex-column justify-content-center align-items-center">
+                            <div className="banner-content">
                                 <h1 className="text-white">
                                     Witaj w wyszukiwarce współlokatorów
                                 </h1>

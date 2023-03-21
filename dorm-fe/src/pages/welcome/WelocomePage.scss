@@ -1,14 +1,14 @@
-.background {
+.banner {
   position: relative;
   height: 500px;
   max-width: 80vw;
   background-image: url("../../../public/assets/welcome.jpg");
   background-repeat: no-repeat;
-  background-position: bottom;
+  background-position: 50% 50%;
   background-size: cover;
   border-radius: 20px;
 
-  .content {
+  .banner-content {
     z-index: 1;
     max-width: 500px;
   }
