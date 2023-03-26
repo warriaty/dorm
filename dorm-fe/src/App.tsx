@@ -22,6 +22,7 @@ import WelcomePage from './pages/welcome/WelcomePage';
 import { IonReactRouter } from '@ionic/react-router';
 import { Route } from 'react-router';
 import LoginPage from './pages/login/LoginPage';
+import GuardedRoute from './components/guarded-route/GuardedRoute';
 
 setupIonicReact();
 
@@ -30,8 +31,12 @@ const App: React.FC = () => {
         <IonApp>
             <IonReactRouter>
                 <IonRouterOutlet id="main">
+                    <GuardedRoute path="/siema"
+                                  component={WelcomePage}
+                                  componentProps={{t: 'test'}}
+                                  restricted={true}/>
                     <Route path="/" exact={true}>
-                        <WelcomePage/>
+                        <WelcomePage t={"siema"}/>
                     </Route>
                     <Route path="/login">
                         <LoginPage registered={true}/>

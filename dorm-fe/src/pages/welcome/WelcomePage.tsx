@@ -2,13 +2,14 @@
 
 import './WelocomePage.scss';
 import React from 'react';
-import { IonButton, IonButtons, IonContent, IonHeader, IonText, IonToolbar } from '@ionic/react';
+import { IonButton, IonButtons, IonContent, IonHeader, IonText, IonTitle, IonToolbar } from '@ionic/react';
 
-const WelcomePage: React.FC = () => {
+const WelcomePage: React.FC<{t: string}> = ({t}) => {
     return (
         <>
             <IonHeader>
                 <IonToolbar>
+                    <IonTitle>{t}</IonTitle>
                     <IonButtons className="ion-padding" slot="end">
                         <IonButton routerLink="/login" color="primary">
                             Login
