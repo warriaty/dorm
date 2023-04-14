@@ -4,13 +4,16 @@ import App from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.css';
+import { AuthContextProvider } from './store/auth-context';
 
 const container = document.getElementById('root');
 const root = createRoot(container!);
 root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+    <React.StrictMode>
+        <AuthContextProvider>
+            <App/>
+        </AuthContextProvider>
+    </React.StrictMode>
 );
 
 // If you want your app to work offline and load faster, you can change

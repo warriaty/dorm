@@ -18,14 +18,19 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
-import WelcomePage from './pages/welcome/WelcomePage';
 import { IonReactRouter } from '@ionic/react-router';
+import React, { useContext } from 'react';
 import { Route } from 'react-router';
+import WelcomePage from './pages/welcome/WelcomePage';
 import LoginPage from './pages/login/LoginPage';
+import AuthRoute from './components/AuthRoute';
+import AuthContext from './store/auth-context';
 
 setupIonicReact();
 
 const App: React.FC = () => {
+    const {isLoggedIn, autoLogoutIn} = useContext(AuthContext);
+
     return (
         <IonApp>
             <IonReactRouter>
@@ -33,12 +38,16 @@ const App: React.FC = () => {
                     <Route path="/" exact={true}>
                         <WelcomePage/>
                     </Route>
-                    <Route path="/login">
-                        <LoginPage registered={true}/>
-                    </Route>
-                    <Route path="/register">
-                        <LoginPage registered={false}/>
-                    </Route>
+                    <AuthRoute authorized={!isLoggedIn} redirectUrl={'/dashboard'} path="/login">
+                        <LoginPage login={true}/>
+                    </AuthRoute>
+                    <AuthRoute authorized={!isLoggedIn} redirectUrl={'/dashboard'} path="/register">
+                        <LoginPage login={false}/>
+                    </AuthRoute>
+                    <AuthRoute authorized={isLoggedIn} path={"/dashboard"}>
+                        <div>Witaj zalogowany użtkowniku</div>
+                        <div>Zostało milisecund do autologotu: {autoLogoutIn}</div>
+                    </AuthRoute>
                 </IonRouterOutlet>
             </IonReactRouter>
         </IonApp>

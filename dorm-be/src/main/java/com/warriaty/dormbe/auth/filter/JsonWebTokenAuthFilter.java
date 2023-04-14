@@ -58,8 +58,9 @@ public class JsonWebTokenAuthFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    public static Optional<String> getJwtFromRequest(HttpServletRequest request) {
-        return ofNullable(request.getHeader(AUTHORIZATION)).map(TOKEN_REGEX::matcher)
+    private static Optional<String> getJwtFromRequest(HttpServletRequest request) {
+        return ofNullable(request.getHeader(AUTHORIZATION))
+                .map(TOKEN_REGEX::matcher)
                 .filter(Matcher::matches)
                 .map(tokenMatcher -> tokenMatcher.group("token"));
     }

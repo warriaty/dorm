@@ -4,7 +4,8 @@ import lombok.Data;
 
 @Data
 public class Jwt {
-    private final String token;
+
+    private final String tokenValue;
 
     private final Long expirationTimestamp;
 }
