@@ -33,6 +33,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     private static UsernameNotFoundException userNotFound(Long userId) {
-        return new UsernameNotFoundException("User with id: %d was not found.".formatted(userId));
+        return new UsernameNotFoundException("User with id: %d was not found".formatted(userId));
     }
 }

@@ -1,7 +1,6 @@
 package com.warriaty.dormbe.auth.filter;
 
-import com.warriaty.dormbe.auth.jwt.JwtProvider;
-import com.warriaty.dormbe.auth.service.UserDetailsServiceImpl;
+import com.warriaty.dormbe.auth.jwt.JwtExtractor;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -13,8 +12,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -26,16 +25,15 @@ import static java.util.Optional.ofNullable;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.security.authentication.UsernamePasswordAuthenticationToken.authenticated;
 
-@Component
 @RequiredArgsConstructor
 public class JsonWebTokenAuthFilter extends OncePerRequestFilter {
 
     private static final Pattern TOKEN_REGEX = Pattern.compile("Bearer (?<token>.+)");
     private static final WebAuthenticationDetailsSource AUTH_DETAILS_SOURCE = new WebAuthenticationDetailsSource();
 
-    private final JwtProvider tokenProvider;
+    private final JwtExtractor tokenProvider;
 
-    private final UserDetailsServiceImpl userPrincipalDetailsService;
+    private final UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(
@@ -51,7 +49,7 @@ public class JsonWebTokenAuthFilter extends OncePerRequestFilter {
 
     private void authenticateToken(HttpServletRequest request, String jwt) throws JwtException {
         String username = tokenProvider.getUsernameFromJwt(jwt);
-        UserDetails userDetails = userPrincipalDetailsService.loadUserByUsername(username);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
         UsernamePasswordAuthenticationToken authentication = createSuccessAuthentication(userDetails, request);
 

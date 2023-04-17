@@ -14,24 +14,21 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.stereotype.Component;
-
 
 import java.io.IOException;
 
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 
-@Component
 public class JsonUsernamePasswordAuthFilter extends UsernamePasswordAuthenticationFilter {
 
     private static final String LOGIN_URL = "/api/login";
     private final ObjectMapper objectMapper;
-    private final JwtProvider jwtProvider;
+    private final JwtProvider jwtService;
 
-    public JsonUsernamePasswordAuthFilter(ObjectMapper objectMapper, AuthenticationManager authenticationManager, JwtProvider jwtProvider) {
+    public JsonUsernamePasswordAuthFilter(ObjectMapper objectMapper, AuthenticationManager authenticationManager, JwtProvider jwtService) {
         super(authenticationManager);
         this.objectMapper = objectMapper;
-        this.jwtProvider = jwtProvider;
+        this.jwtService = jwtService;
         this.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher(LOGIN_URL, "POST"));
     }
 
@@ -49,12 +46,13 @@ public class JsonUsernamePasswordAuthFilter extends UsernamePasswordAuthenticati
         }
     }
 
+
     @Override
     public void successfulAuthentication(
             HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication
     ) throws IOException {
         UserDetails principal = (UserDetails) authentication.getPrincipal();
-        Jwt token = jwtProvider.generateToken(principal);
+        Jwt token = jwtService.generateToken(principal);
         response.setHeader(CONTENT_TYPE, "application/json");
         objectMapper.writeValue(response.getWriter(), token);
     }
