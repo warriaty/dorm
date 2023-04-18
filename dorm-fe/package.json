@@ -8,8 +8,8 @@
     "@capacitor/haptics": "4.1.0",
     "@capacitor/keyboard": "4.1.1",
     "@capacitor/status-bar": "4.1.1",
-    "@ionic/react": "^6.0.0",
-    "@ionic/react-router": "^6.0.0",
+    "@ionic/react": "^7.0.2",
+    "@ionic/react-router": "^7.0.2",
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^12.6.3",
@@ -48,7 +48,7 @@
   "scripts": {
     "start": "env-cmd -f .env.development react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --transformIgnorePatterns 'node_modules/(?!(@ionic/react|@ionic/react-router|@ionic/core|@stencil/core|ionicons)/)'",
+    "test": "react-scripts test --transformIgnorePatterns 'node_modules/(?!(@ionic/react|@ionic/react-router|@ionic/core|@stencil/core|ionicons|axios)/)'",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

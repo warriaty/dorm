@@ -21,13 +21,11 @@ export const useLsToken = () => {
     const saveToken = (token: Token) => {
         LsTokenService.saveToken(token);
         setToken(token);
-        console.log("setToken");
     }
 
     const removeToken = () => {
         LsTokenService.removeToken();
         setToken(null);
-        console.log("token removed");
     }
 
     return { isPresent: !!token, expiresIn: expiresIn(), saveToken, removeToken };
