@@ -11,7 +11,7 @@ interface Auth {
 
 const AuthContext = React.createContext<Auth>({
     isLoggedIn: false,
-    login: (tokenValue: string, expirationTimestamp: number) => {
+    login: (_tokenValue: string, _expirationTimestamp: number) => {
     },
     logout: () => {
     },
