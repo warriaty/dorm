@@ -46,8 +46,8 @@ describe('LoginPage component', () => {
 
         it('Should navigate to dashboard on sign in', async () => {
             //given
+            mockLoginRequest();
             const { findByText } = render(<LoginPage login={true}/>);
-            const httpPost = mockLoginRequest();
 
             //when
             await findByText('OK').then(ionFireEvent.submit);
@@ -75,8 +75,8 @@ describe('LoginPage component', () => {
 
         it('Should navigate to dashboard on sign up', async () => {
             //given
+            mockLoginRequest();
             const { findByText } = render(<LoginPage login={false}/>);
-            const httpPost = mockLoginRequest();
 
             //when
             await findByText('OK').then(ionFireEvent.submit);
