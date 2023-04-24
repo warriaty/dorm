@@ -11,24 +11,72 @@ jest.mock('react-router', () => ({
     })
 }));
 
-jest.mock('../../util/HttpService', () => {
-    return {
-        post: () => new Promise(resolve =>
-            resolve({
-                    data: {
-                        tokenValue: 'test',
-                        expirationTimestamp: 'test'
-                    }
+jest.mock('../../util/HttpService', () =>
+    ({
+        post: Function
+    })
+);
+
+const mockLoginRequest = () => jest.spyOn(require('../../util/HttpService'), 'post')
+    .mockReturnValue(new Promise(resolve =>
+        resolve({
+                data: {
+                    tokenValue: 'test',
+                    expirationTimestamp: 'test'
                 }
-            ))
-    };
-});
+            }
+        )));
 
 describe('LoginPage component', () => {
     describe('Sign in scenarios', function () {
+
+        it('Should send post to login url on submit', async () => {
+            //given
+            const httpPost = mockLoginRequest();
+            const { findByText, findByTitle } = render(<LoginPage login={true}/>);
+
+            //when
+            await findByTitle('email').then(input => ionFireEvent.ionChange(input, 'test'));
+            await findByTitle('password').then(input => ionFireEvent.ionChange(input, 'test'));
+            await findByText('OK').then(ionFireEvent.submit);
+
+            //then
+            expect(httpPost).toBeCalledWith('/login', { 'email': 'test', 'password': 'test' });
+        });
+
         it('Should navigate to dashboard on sign in', async () => {
             //given
             const { findByText } = render(<LoginPage login={true}/>);
+            const httpPost = mockLoginRequest();
+
+            //when
+            await findByText('OK').then(ionFireEvent.submit);
+
+            //then
+            expect(mockHistoryPush).toBeCalledWith('dashboard');
+        });
+    });
+
+    describe('Sign up scenarios', function () {
+
+        it('Should send post to register url on submit', async () => {
+            //given
+            const httpPost = mockLoginRequest();
+            const { findByText, findByTitle } = render(<LoginPage login={false}/>);
+
+            //when
+            await findByTitle('email').then(input => ionFireEvent.ionChange(input, 'test'));
+            await findByTitle('password').then(input => ionFireEvent.ionChange(input, 'test'));
+            await findByText('OK').then(ionFireEvent.submit);
+
+            //then
+            expect(httpPost).toBeCalledWith('user/register', { 'email': 'test', 'password': 'test' });
+        });
+
+        it('Should navigate to dashboard on sign up', async () => {
+            //given
+            const { findByText } = render(<LoginPage login={false}/>);
+            const httpPost = mockLoginRequest();
 
             //when
             await findByText('OK').then(ionFireEvent.submit);
