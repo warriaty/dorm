@@ -10,11 +10,12 @@ import {
 } from '@ionic/react';
 
 import './LoginPage.scss';
-import React, { FormEvent, useContext, useState } from 'react';
+import React, { FormEvent, useContext } from 'react';
 import AuthContext from '../../store/auth-context';
 import { useHistory } from 'react-router';
 import httpService from '../../util/HttpService';
 import { BeToken } from '../../util/Token';
+import { useDebounceState } from '../../hooks/UseDebounceState';
 
 interface LoginPageProps {
     login: boolean;
@@ -24,8 +25,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ login }) => {
 
     const { login: loginHandler } = useContext(AuthContext);
     const { push } = useHistory();
-    const [email, setEmail] = useState<String | number>("");
-    const [psswd, setPsswd] = useState<String | number>("");
+    const [email, setEmail] = useDebounceState<String | number>("", 100);
+    const [psswd, setPsswd] = useDebounceState<String | number>("", 100);
 
     const onSubmitHandler = (event: FormEvent) => {
         event.preventDefault();
@@ -61,7 +62,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ login }) => {
                                           label="Email:"
                                           size={40}
                                           required
-                                          onIonChange={e => setEmail(e.detail.value!)}/>
+                                          onIonInput={e => setEmail(e.detail.value!)}/>
                             </IonItem>
                             <IonItem className="ion-padding">
                                 <IonInput autocomplete="off"
@@ -71,7 +72,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ login }) => {
                                           label="Hasło:"
                                           size={40}
                                           required
-                                          onIonChange={e => setPsswd(e.detail.value!)}/>
+                                          onIonInput={e => setPsswd(e.detail.value!)}/>
                             </IonItem>
 
                             <div className="ion-padding-horizontal d-flex justify-content-between">
