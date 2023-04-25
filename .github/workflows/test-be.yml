@@ -34,8 +34,8 @@ jobs:
         image: postgres:15-alpine
         env:
           POSTGRES_DB: dorm
-          POSTGRES_USER: dorm
-          POSTGRES_PASSWORD: dorm
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
         ports:
           - "5432:5432"
 
@@ -44,7 +44,7 @@ jobs:
         if: ${{ needs.check.outputs.be_changed == 'false' }}
         run: echo "No changes, nothing to do ¯\_(ツ)_/¯"
 
-      - name: Checkout main
+      - name: Checkout branch
         if: ${{ needs.check.outputs.be_changed == 'true' }}
         uses: actions/checkout@v3
 
