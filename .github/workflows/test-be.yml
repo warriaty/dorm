@@ -34,8 +34,8 @@ jobs:
         image: postgres:15-alpine
         env:
           POSTGRES_DB: dorm
-          POSTGRES_USER: dorm
-          POSTGRES_PASSWORD: dorm
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
         ports:
           - "5432:5432"
 
@@ -56,14 +56,10 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
-      - name: Add secrets
-        if: ${{ needs.check.outputs.be_changed == 'true' }}
-        working-directory: ./dorm-be
-        run:  echo "ext { Secrets = [ jasypt_key:'${{secrets.JASYPT_KEY}}' ]}" >> secrets.gradle
-
       - name: Run tests
         if: ${{ needs.check.outputs.be_changed == 'true' }}
         working-directory: ./dorm-be
         run: >
           ./gradlew test 
+          -PcliArgs='-Dspring.datasource.username=test -Dspring.datasource.password=test'
           --no-daemon
