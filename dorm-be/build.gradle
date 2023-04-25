@@ -38,14 +38,15 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
 }
 
-apply from: "${rootProject.projectDir}/secrets.gradle"
-
 ext {
     propsPath = "src/main/resources/application.properties"
 }
 
 bootRun {
-    jvmArgs = ["-Djasypt.encryptor.password=${Secrets.jasypt_key}"]
+    def cliArgs = readCliArgs()
+    if (!cliArgs.isEmpty()) {
+        jvmArgs = cliArgs
+    }
 }
 
 // Jasypt
@@ -92,6 +93,17 @@ def findJar(regex) {
 }
 
 tasks.named('test') {
-    jvmArgs = ["-Djasypt.encryptor.password=${Secrets.jasypt_key}"]
+    def cliArgs = readCliArgs()
+    if (!cliArgs.isEmpty()) {
+        jvmArgs = cliArgs
+    }
     useJUnitPlatform()
+}
+
+def readCliArgs() {
+    def cliArgs = new HashSet()
+    if (project.hasProperty('cliArgs')) {
+        cliArgs.addAll(project.cliArgs.toString().split("\\s+"))
+    }
+    return cliArgs
 }
