@@ -1,0 +1,49 @@
+name: test-fe
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    outputs:
+      fe_changed: ${{ steps.dorm_fe.outputs.changed }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - run: git fetch origin main
+
+      - id: dorm_fe
+        name: Check if dorm-fe has been changed
+        run: >
+          if grep -q "^dorm-fe/" <<< $(git diff --name-only origin/main --) ;
+          then echo "changed=true" >> $GITHUB_OUTPUT;
+          else echo "changed=false" >> $GITHUB_OUTPUT;
+          fi
+
+  test-fe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: check
+
+    steps:
+      - name: No changes detected
+        if: ${{ needs.check.outputs.fe_changed == 'false' }}
+        run: echo "No changes, nothing to do ¯\_(ツ)_/¯"
+
+      - name: Checkout branch
+        if: ${{ needs.check.outputs.fe_changed == 'true' }}
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        if: ${{ needs.check.outputs.fe_changed == 'true' }}
+        working-directory: ./dorm-fe
+        run: npm install
+
+      - name: Run tests
+        if: ${{ needs.check.outputs.fe_changed == 'true' }}
+        working-directory: ./dorm-fe
+        run: npm run test:ci
