@@ -44,7 +44,7 @@ jobs:
         if: ${{ needs.check.outputs.be_changed == 'false' }}
         run: echo "No changes, nothing to do ¯\_(ツ)_/¯"
 
-      - name: Checkout main
+      - name: Checkout branch
         if: ${{ needs.check.outputs.be_changed == 'true' }}
         uses: actions/checkout@v3
 
