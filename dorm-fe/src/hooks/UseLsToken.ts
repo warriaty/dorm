@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Token } from '../util/Token';
 import { LOCAL_STORAGE_TOKEN_KEY } from '../util/Consts';
+import { InternalAxiosRequestConfig } from 'axios';
 
 export const useLsToken = () => {
     const [token, setToken] = useState<Token | null>(LsTokenService.fetchToken());
@@ -21,12 +22,12 @@ export const useLsToken = () => {
     const saveToken = (token: Token) => {
         LsTokenService.saveToken(token);
         setToken(token);
-    }
+    };
 
     const removeToken = () => {
         LsTokenService.removeToken();
         setToken(null);
-    }
+    };
 
     return { isPresent: !!token, expiresIn: expiresIn(), saveToken, removeToken };
 };
@@ -50,5 +51,13 @@ export class LsTokenService {
 
     static removeToken() {
         return localStorage.removeItem(LOCAL_STORAGE_TOKEN_KEY);
+    };
+
+    static authInterceptor(config: InternalAxiosRequestConfig<any>) {
+        const token = LsTokenService.fetchToken();
+        if (token && !config.headers.Authorization) {
+            config.headers.Authorization = 'Bearer ' + token.value;
+        }
+        return config;
     };
 }
