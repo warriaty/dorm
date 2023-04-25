@@ -2,14 +2,7 @@ package com.warriaty.dormbe.auth.jwt;
 
 import com.warriaty.dormbe.auth.model.UserDetailsImpl;
 import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import javax.crypto.SecretKey;
 
 import static java.time.Instant.now;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,16 +13,6 @@ class JwtServiceTest {
 
     private final JwtService testObject = new JwtService(10000);
 
-    private final SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-
-    private final JwtParser jwtParser = Jwts.parserBuilder().setSigningKey(key).build();
-
-    @BeforeEach
-    void init() {
-        setField(testObject, "key", key);
-        setField(testObject, "jwtParser", jwtParser);
-    }
-
     @Test
     void shouldGenerateToken() {
         //given
@@ -39,7 +22,7 @@ class JwtServiceTest {
         var token = testObject.generateToken(userDetails);
 
         //then
-        var body = jwtParser.parseClaimsJws(token.getTokenValue()).getBody();
+        var body = JwtService.JWT_PARSER.parseClaimsJws(token.getTokenValue()).getBody();
         assertThat(body.getSubject()).isEqualTo("user@test.com");
         assertThat(body.getIssuedAt()).isCloseTo(now(), 5000);
         int jwtExpirationInMs = 10000;
