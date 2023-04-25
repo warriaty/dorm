@@ -1,0 +1,68 @@
+name: test backend
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    outputs:
+      be_changed: ${{ steps.dorm_be.outputs.changed }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - run: git fetch origin master
+
+      - id: dorm_be
+        name: Check if dorm-be has been changed
+        run: >
+          if grep -q "^dorm-be/" <<< $(git diff --name-only origin/master --) ;
+          then echo "changed=true" >> $GITHUB_OUTPUT;
+          else echo "changed=false" >> $GITHUB_OUTPUT;
+          fi
+
+  test-be:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: check
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
+        ports:
+          - "5432:5432"
+
+    steps:
+      - name: Checkout master branch
+        uses: actions/checkout@v3
+        with:
+          ref: master
+
+      - name: Install JDK 17
+        if: ${{ needs.check.outputs.client_portal_be_changed == 'true' }}
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Add gradle secrets
+        if: ${{ needs.check.outputs.be_changed == 'true' }}
+        working-directory: ./dorm-be
+        run:  echo "ext { Secrets = [ jasypt_key:'${{secrets.JASYPT_KEY}}' ]}" >> secrets.gradle
+
+      - name: Run tests with Gradle
+        if: ${{ needs.check.outputs.dorm_be_changed == 'true' }}
+        working-directory: ./dorm-be
+        run: >
+          ./gradlew test 
+          -Dspring.datasource.username=test 
+          -Dspring.datasource.password=test
+          --no-daemon

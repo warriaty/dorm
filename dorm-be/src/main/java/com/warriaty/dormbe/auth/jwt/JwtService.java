@@ -13,9 +13,9 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtService implements JwtProvider, JwtExtractor {
 
-    private final static SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private final static SecretKey KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
-    private final static JwtParser jwtParser = Jwts.parserBuilder().setSigningKey(key).build();
+    final static JwtParser JWT_PARSER = Jwts.parserBuilder().setSigningKey(KEY).build();
 
     private final int jwtExpirationInMs;
 
@@ -27,11 +27,11 @@ public class JwtService implements JwtProvider, JwtExtractor {
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
-                .signWith(key)
+                .signWith(KEY)
                 .compact(), expiryDate.getTime());
     }
 
     public String getUsernameFromJwt(String token) throws JwtException {
-        return jwtParser.parseClaimsJws(token).getBody().getSubject();
+        return JWT_PARSER.parseClaimsJws(token).getBody().getSubject();
     }
 }
