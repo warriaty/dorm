@@ -31,7 +31,7 @@ jobs:
 
     steps:
       - name: No changes detected
-        if: ${{ needs.check.outputs.be_changed == 'false' }}
+        if: ${{ needs.check.outputs.fe_changed == 'false' }}
         run: echo "No changes, nothing to do ¯\_(ツ)_/¯"
 
       - name: Checkout branch
