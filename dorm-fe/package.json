@@ -93,5 +93,5 @@
       "node_modules/(?!(@ionic/react|@ionic/react-router|@ionic/core|@stencil/core|ionicons|axios)/)"
     ]
   },
-  "description": "Frontend for dorm app"
+  "description": "Frontend for dorm app :)"
 }
