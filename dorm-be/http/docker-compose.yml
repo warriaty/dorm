@@ -1,0 +1,14 @@
+services:
+  ijhttp:
+    container_name: ijhttp
+    image: jetbrains/intellij-http-client
+    environment:
+      POSTGRES_USER: dorm-be
+      POSTGRES_PASSWORD: dorm-be
+    volumes:
+      - ./:/workdir
+    extra_hosts:
+      - "host.docker.internal.host:host-gateway"
+    command: |
+      -D
+      login/login.example.http
