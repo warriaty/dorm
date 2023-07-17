@@ -51,6 +51,7 @@ bootRun {
 
 // Jasypt
 tasks.register('encryptProperties') {
+    apply from: "${rootProject.projectDir}/secrets.gradle.template"
     def decipheredSecretPattern = "DEC\\(.+\\)"
     def props = new Properties()
     file(propsPath).withInputStream { props.load(it) }
