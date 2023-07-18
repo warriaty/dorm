@@ -43,29 +43,29 @@ jobs:
 
     steps:
       - name: No changes detected
-        if: ${{ react_changed == 'false' && angular_changed == 'false' }}
+        if: ${{ env.react_changed == 'false' && env.angular_changed == 'false' }}
         run: echo "No changes, nothing to do ¯\_(ツ)_/¯"
 
       - name: Checkout branch
-        if: ${{ react_changed == 'true' || angular_changed == 'true' }}
+        if: ${{ env.react_changed == 'true' || env.angular_changed == 'true' }}
         uses: actions/checkout@v3
 
       - name: Install react dependencies
-        if: ${{ react_changed == 'true' }}
+        if: ${{ env.react_changed == 'true' }}
         working-directory: ./dorm-fe/react
         run: npm install
 
       - name: Run react tests
-        if: ${{ react_changed == 'true' }}
+        if: ${{ env.react_changed == 'true' }}
         working-directory: ./dorm-fe/react
         run: npm run test:ci
 
       - name: Install angular dependencies
-        if: ${{ angular_changed == 'true' }}
+        if: ${{ env.angular_changed == 'true' }}
         working-directory: ./dorm-fe/angular
         run: npm install
 
       - name: Run angular tests
-        if: ${{ angular_changed == 'true' }}
+        if: ${{ env.angular_changed == 'true' }}
         working-directory: ./dorm-fe/angular
         run: npm run test:ci
