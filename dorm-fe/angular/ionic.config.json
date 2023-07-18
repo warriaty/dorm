@@ -1,5 +1,7 @@
 {
   "name": "dorm-fe",
-  "integrations": {},
+  "integrations": {
+    "capacitor": {}
+  },
   "type": "angular"
 }
