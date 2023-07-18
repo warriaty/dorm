@@ -9,41 +9,63 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 1
     outputs:
-      fe_changed: ${{ steps.dorm_fe.outputs.changed }}
+      react_changed: ${{ steps.dorm_react.outputs.changed }}
+      angular_changed: ${{ steps.dorm_angular.outputs.changed }}
 
     steps:
       - uses: actions/checkout@v3
 
       - run: git fetch origin main
 
-      - id: dorm_fe
-        name: Check if dorm-fe has been changed
+      - id: dorm_react
+        name: Check if dorm-react has been changed
         run: >
-          if grep -q "^dorm-fe/" <<< $(git diff --name-only origin/main --) ;
+          if grep -q "^dorm-fe/react/" <<< $(git diff --name-only origin/main --) ;
           then echo "changed=true" >> $GITHUB_OUTPUT;
           else echo "changed=false" >> $GITHUB_OUTPUT;
           fi
+
+      - id: dorm_angular
+        name: Check if dorm-angular has been changed
+        run: >
+          if grep -q "^dorm-fe/angular/" <<< $(git diff --name-only origin/main --) ;
+          then echo "changed=true" >> $GITHUB_OUTPUT;
+          else echo "changed=false" >> $GITHUB_OUTPUT;
+          fi          
 
   test-fe:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: check
+    env:
+      react_changed: ${{ needs.check.outputs.react_changed }}
+      angular_changed: ${{ needs.check.outputs.angular_changed }}
 
     steps:
       - name: No changes detected
-        if: ${{ needs.check.outputs.fe_changed == 'false' }}
+        if: ${{ env.react_changed == 'false' && env.angular_changed == 'false' }}
         run: echo "No changes, nothing to do ¯\_(ツ)_/¯"
 
       - name: Checkout branch
-        if: ${{ needs.check.outputs.fe_changed == 'true' }}
+        if: ${{ env.react_changed == 'true' || env.angular_changed == 'true' }}
         uses: actions/checkout@v3
 
-      - name: Install dependencies
-        if: ${{ needs.check.outputs.fe_changed == 'true' }}
-        working-directory: ./dorm-fe
+      - name: Install react dependencies
+        if: ${{ env.react_changed == 'true' }}
+        working-directory: ./dorm-fe/react
         run: npm install
 
-      - name: Run tests
-        if: ${{ needs.check.outputs.fe_changed == 'true' }}
-        working-directory: ./dorm-fe
+      - name: Run react tests
+        if: ${{ env.react_changed == 'true' }}
+        working-directory: ./dorm-fe/react
+        run: npm run test:ci
+
+      - name: Install angular dependencies
+        if: ${{ env.angular_changed == 'true' }}
+        working-directory: ./dorm-fe/angular
+        run: npm install
+
+      - name: Run angular tests
+        if: ${{ env.angular_changed == 'true' }}
+        working-directory: ./dorm-fe/angular
         run: npm run test:ci
